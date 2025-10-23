@@ -1,0 +1,130 @@
+You are an expert Python developer.  
+Generate a complete, production-quality Streamlit app using Python and Gemini API for the following project:
+
+---
+
+### 🎯 PROJECT TITLE:
+AI Credit Card Statement Analyzer (Gemini + Streamlit)
+
+---
+
+### 🧩 OBJECTIVE:
+I want a simple reference app that:
+1. Takes a credit card statement **PDF** upload from the user (via Streamlit UI)
+2. Sends it to **Gemini API** for OCR and parsing
+3. Gemini returns a **structured JSON** with all extracted information
+4. The app then:
+   - Displays extracted data nicely (card details, totals, transactions)
+   - Analyzes spending (category-wise, monthly)
+   - Generates insights automatically
+   - Allows export to JSON or CSV
+5. No manual regex parsing — all text extraction and understanding are done by Gemini.
+
+---
+
+### 📂 FOLDER STRUCTURE (Keep it clean)
+
+```
+
+credit-card-parser/
+│
+├── data/
+│   └── sample_statement.pdf
+│
+├── output/
+│   ├── extracted_data.json
+│   └── summary.csv
+│
+├── app.py
+└── requirements.txt
+
+````
+
+### ⚙️ HOW IT SHOULD WORK
+
+1. **Streamlit UI**
+   - File uploader: only accepts `.pdf`
+   - When user uploads a PDF → send file bytes to Gemini API
+   - Show a loading spinner while Gemini processes
+   - Display:
+     - Card info (issuer, last 4 digits, period, due date)
+     - Summary table (total due, min due, available limit)
+     - Transaction table
+     - Category-wise pie chart
+     - Top 3 insights (spending, credit usage, etc.)
+   - Buttons to export extracted data to `.json` or `.csv`
+
+2. **Gemini API Integration**
+   - Use Google Generative AI Python SDK (`google.generativeai`)
+   - Send PDF file to Gemini with prompt like:
+     ```
+     Extract structured financial data from this credit card statement.
+     Return JSON with fields:
+     issuer, card_last_4, billing_period, payment_due_date, total_due, available_limit, transactions[], insights[].
+     ```
+   - Gemini should respond with a valid JSON.
+
+3. **Data Handling**
+   - Parse the returned JSON using `json.loads()`
+   - Convert transactions into a Pandas DataFrame
+   - Create:
+     - Category pie chart
+     - Spending trend chart (if possible)
+   - Generate insights (e.g., highest purchase, most frequent category)
+
+4. **Export**
+   - Save Gemini’s JSON response to `output/extracted_data.json`
+   - Export DataFrame to `output/summary.csv`
+
+---
+
+### 🧾 SAMPLE JSON (for reference and for generating PDF)
+
+```json
+{
+  "issuer": "HDFC Bank",
+  "customer_name": "Rahul Sharma",
+  "card_type": "HDFC Regalia Credit Card",
+  "card_last_4": "5234",
+  "statement_period": {
+    "from": "01-Sep-2025",
+    "to": "30-Sep-2025"
+  },
+  "payment_due_date": "20-Oct-2025",
+  "credit_limit": "₹2,00,000",
+  "available_credit_limit": "₹1,32,450",
+  "total_amount_due": "₹67,550.00",
+  "transactions": [
+    {"date": "03-Sep-2025", "description": "Zomato Order - Food Delivery", "amount": "₹850.00", "type": "Debit", "category": "Food & Dining"},
+    {"date": "05-Sep-2025", "description": "Uber Ride - Local Travel", "amount": "₹220.00", "type": "Debit", "category": "Transport"},
+    {"date": "10-Sep-2025", "description": "Amazon Purchase - Electronics", "amount": "₹12,999.00", "type": "Debit", "category": "Shopping"},
+    {"date": "15-Sep-2025", "description": "Credit Card Payment Received - Thank You", "amount": "₹22,000.00", "type": "Credit", "category": "Payment"},
+    {"date": "20-Sep-2025", "description": "Swiggy Instamart - Groceries", "amount": "₹1,280.00", "type": "Debit", "category": "Groceries"},
+    {"date": "27-Sep-2025", "description": "IRCTC Train Booking", "amount": "₹1,950.00", "type": "Debit", "category": "Travel"},
+    {"date": "29-Sep-2025", "description": "Netflix Subscription", "amount": "₹649.00", "type": "Debit", "category": "Entertainment"}
+  ],
+  "insights": [
+    "Your spending on Food & Dining increased by 30% this month.",
+    "You have utilized 33.7% of your total credit limit.",
+    "You earned 420 reward points this month.",
+    "Your largest purchase was ₹12,999.00 at Amazon."
+  ]
+}
+````
+
+### 🚀 WHAT CLAUDE SHOULD GENERATE
+
+1. `app.py` — main Streamlit app
+3. Minimal `requirements.txt`
+4. Working example showing how Gemini extracts and returns structured JSON
+
+---
+
+### ✅ EXPECTED USER FLOW
+
+1. Run `streamlit run app.py`
+2. Upload a PDF
+3. App calls Gemini → gets JSON
+4. Data displayed in clean dashboard format
+5. Option to export JSON/CSV
+6. Optional PDF generator for testing
